@@ -1,6 +1,6 @@
-# CEPIK Vehicle History Client
+# CEPiK Vehicle History Client
 
-A Python client for retrieving vehicle history data from the Polish government's historiapojazdu.gov.pl service (CEPIK - Centralna Ewidencja Pojazdów i Kierowców).
+A Python client for retrieving vehicle history data from the Polish government's historiapojazdu.gov.pl service (CEPiK - Centralna Ewidencja Pojazdów i Kierowców).
 
 ## Description
 
@@ -37,7 +37,7 @@ pip install requests
 
 To use the client, you need three pieces of information about the vehicle:
 - Registration number (license plate)
-- VIN number
+- VIN
 - First registration date
 
 ### Basic Example
@@ -106,7 +106,7 @@ This tool is intended for legitimate purposes, e.g.:
 - Vehicle purchase verification
 - Fleet management
 
-Please ensure you have proper authorization to access vehicle information and comply with Polish data protection laws.
+Please ensure you have proper authorisation to access vehicle information and comply with Polish data protection laws.
 
 ## Contributing
 
@@ -114,7 +114,7 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 
 ## License
 
-This project is provided as-is for educational and legitimate business purposes. Users are responsible for ensuring compliance with applicable laws and terms of service.
+This project is provided as-is for educational and legitimate business purposes. Users are responsible for ensuring compliance with applicable laws and the terms of service.
 
 ## Disclaimer
 

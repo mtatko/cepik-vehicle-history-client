@@ -34,7 +34,7 @@ class VehicleHistoryClient:
     def __setup_session_headers(self):
         self.session.headers.update({
             "Accept-Language": "pl-PL,pl;q=0.9",
-            "User-Agent": f"cepik-vehicle-history-client/0.1.0; Python/{platform.python_version()}",
+            "User-Agent": f"cepik-vehicle-history-client/0.1.1; Python/{platform.python_version()}",
             })
 
     @staticmethod

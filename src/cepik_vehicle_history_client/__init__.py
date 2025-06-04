@@ -6,7 +6,7 @@ __all__ = [
     "VehicleHistoryClientError",
 ]
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "Mateusz Tatko"
 __email__ = "mtatko@mtatko.dev"
 __license__ = "MIT"

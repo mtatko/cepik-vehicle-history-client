@@ -1,7 +1,7 @@
 [project]
 name = "cepik-vehicle-history-client"
-version = "0.1.0"
-description = ""
+version = "0.1.1"
+description = "A Python client for the CEPiK vehicle history service."
 authors = [
     {name = "Mateusz Tatko",email = "mtatko@mtatko.dev"}
 ]

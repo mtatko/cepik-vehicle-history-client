@@ -11,26 +11,21 @@ This repository contains a Python library that provides programmatic access to v
 - **Session Management**: Automatic creation and management of authenticated sessions with moj.gov.pl
 - **Vehicle Technical Data**: Retrieve detailed technical specifications and current vehicle information
 - **Timeline Data**: Access complete vehicle history including ownership changes, registrations, and other events
+- **Context Manager**: Convenient `authenticated_session()` context manager for automatic session cleanup
+- **Error Handling**: Comprehensive error handling with custom exceptions
 - **Session Cleanup**: Proper session closure to prevent conflicts between executions
 
 ## Requirements
 
-- Python 3.7+
-- `requests` library
-- `json` (built-in)
-- `time` (built-in)
+- Python 3.13+
+- PyPI
 
 ## Installation
 
-1. Clone the repository:
-```bash
-git clone https://github.com/mtatko/cepik-vehicle-history-client.git
-cd cepik-vehicle-history-client
-```
+You can install the client using pip:
 
-2. Install required dependencies:
 ```bash
-pip install requests
+pip install cepik-vehicle-history-client
 ```
 
 ## Usage
@@ -40,52 +35,107 @@ To use the client, you need three pieces of information about the vehicle:
 - VIN
 - First registration date
 
-### Basic Example
+### Basic Example with Context Manager (Recommended)
 
 ```python
-from cepik_client import create_session, authenticate_session, get_vehicle_data, get_timeline_data, close_session
+from cepik_vehicle_history_client import VehicleHistoryClient, VehicleInfo
 
-# Create and authenticate session
-session = create_session()
-session, nf_wid = authenticate_session(session)
+# Create vehicle info object
+vehicle_info = VehicleInfo(
+    registration_number="ABC12345",
+    vin="1234567890ABCDEFG",
+    first_registration_date="2020-01-15"
+)
 
-# Vehicle information
-registration_number = "ABC12345"
-vin_number = "1234567890ABCDEFG"
-first_registration_date = "2020-01-15"
+# Use context manager for automatic session management
+client = VehicleHistoryClient()
 
 try:
-    # Get vehicle technical data
-    vehicle_data = get_vehicle_data(session, nf_wid, registration_number, vin_number, first_registration_date)
+    with client.authenticated_session() as session:
+        # Get vehicle technical data
+        vehicle_data = session.get_vehicle_data(vehicle_info)
+        print("Vehicle Data:", vehicle_data)
+        
+        # Get vehicle timeline/history
+        timeline_data = session.get_timeline_data(vehicle_info)
+        print("Timeline Data:", timeline_data)
+        
+except Exception as e:
+    print(f"Error: {e}")
+```
+
+### Manual Session Management
+
+```python
+from cepik_vehicle_history_client import VehicleHistoryClient, VehicleInfo
+
+# Create client and vehicle info
+client = VehicleHistoryClient()
+vehicle_info = VehicleInfo(
+    registration_number="ABC12345",
+    vin="1234567890ABCDEFG",
+    first_registration_date="2020-01-15"
+)
+
+try:
+    # Manual session creation and authentication
+    client.create_session()
+    client.authenticate_session()
+    
+    # Get vehicle data
+    vehicle_data = client.get_vehicle_data(vehicle_info)
     print("Vehicle Data:", vehicle_data)
     
-    # Get vehicle timeline/history
-    timeline_data = get_timeline_data(session, nf_wid, registration_number, vin_number, first_registration_date)
+    # Get timeline data
+    timeline_data = client.get_timeline_data(vehicle_info)
     print("Timeline Data:", timeline_data)
     
 except Exception as e:
     print(f"Error: {e}")
 finally:
     # Always close the session
-    close_session(session, nf_wid)
+    client.close_session()
 ```
 
-## API Functions
+## API Reference
 
-### `create_session() -> dict`
+### Classes
+
+#### `VehicleInfo`
+A dataclass containing vehicle identification information.
+
+**Attributes:**
+- `registration_number` (str): Vehicle registration number (license plate)
+- `vin` (str): Vehicle Identification Number
+- `first_registration_date` (str): First registration date in YYYY-MM-DD format
+
+#### `VehicleHistoryClient`
+Main client class for accessing the CEPiK vehicle history service.
+
+### Methods
+
+#### `create_session() -> dict[str, str]`
 Creates a new session with the moj.gov.pl service and retrieves necessary cookies.
 
-### `authenticate_session(session) -> tuple[dict, str]`
+#### `authenticate_session() -> tuple[dict[str, str], str]`
 Authenticates the session and returns updated cookies along with the session ID (NF_WID).
 
-### `get_vehicle_data(session, nfwid, registration_number, vin_number, first_registration_date) -> dict`
+#### `get_vehicle_data(vehicle_info: VehicleInfo) -> dict`
 Retrieves technical vehicle data including specifications, current status, and registration details.
 
-### `get_timeline_data(session, nfwid, registration_number, vin_number, first_registration_date) -> dict`
+#### `get_timeline_data(vehicle_info: VehicleInfo) -> dict`
 Retrieves historical timeline data showing the vehicle's registration history, ownership changes, and other events.
 
-### `close_session(session, nfwid) -> None`
+#### `close_session() -> None`
 Properly closes the session to free up resources on the server.
+
+#### `authenticated_session()` (Context Manager)
+Context manager that automatically handles session creation, authentication, and cleanup.
+
+### Exceptions
+
+#### `VehicleHistoryClientError`
+Base exception class for all client-related errors.
 
 ## Data Format
 
@@ -97,7 +147,7 @@ The service returns data in Polish. Common fields include:
 
 - This client accesses a Polish government service - use it responsibly and in accordance with their terms of service and local law
 - The service may have rate limiting - avoid making excessive requests
-- **Always** ensure sessions are properly closed using `close_session()`
+- **Always** ensure sessions are properly closed (use the context manager when possible)
 - Vehicle data requires accurate input - incorrect VIN, registration number, or date will result in no data
 
 ## Legal and Ethical Use
@@ -105,6 +155,7 @@ The service returns data in Polish. Common fields include:
 This tool is intended for legitimate purposes, e.g.:
 - Vehicle purchase verification
 - Fleet management
+- Insurance verification
 
 Please ensure you have proper authorisation to access vehicle information and comply with Polish data protection laws.
 
